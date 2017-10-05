@@ -4,17 +4,21 @@
 Module implementing MainWindow.
 """
 
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QAbstractTableModel, QDate, QVariant, Qt
+from PyQt5.QtWidgets import QMainWindow, QMessageBox
 
 from .Ui_mainWindow import Ui_MainWindow
+
+import mysql.connector, configparser
+import datetime # , date, timedelta
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """
     Class documentation goes here.
     """
-    def __init__(self, parent=None):
+    reconnectDB = pyqtSignal()
+    def __init__(self, user, parent=None):
         """
         Constructor
         
@@ -23,6 +27,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
+        Today = QDate.currentDate()
+        self.dateBefore.setDate(Today)
+        self.dateAfter.setDate(Today.addDays(-14))
     
     @pyqtSlot(QDate)
     def on_dateAfter_userDateChanged(self, date):
@@ -33,7 +40,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         @type QDate
         """
         # TODO: not implemented yet
-        raise NotImplementedError
+        pass
     
     @pyqtSlot(QDate)
     def on_dateBefore_userDateChanged(self, date):
@@ -44,7 +51,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         @type QDate
         """
         # TODO: not implemented yet
-        raise NotImplementedError
+        pass
     
     @pyqtSlot(str)
     def on_stateBox_currentIndexChanged(self, p0):
@@ -55,7 +62,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         @type str
         """
         # TODO: not implemented yet
-        raise NotImplementedError
+        pass
     
     @pyqtSlot()
     def on_addIncidentButton_released(self):
@@ -75,11 +82,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     @pyqtSlot()
     def on_connectToDbAction_triggered(self):
-        """
-        Slot documentation goes here.
-        """
-        # TODO: not implemented yet
-        raise NotImplementedError
+        self.reconnectDB.emit()
+        self.close()
+
     
     @pyqtSlot()
     def on_exitAction_triggered(self):
@@ -87,4 +92,4 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Slot documentation goes here.
         """
         # TODO: not implemented yet
-        raise NotImplementedError
+        self.close()

@@ -12,7 +12,7 @@ from ui.Ui_userAuth import Ui_userAuth
 
 
 class userAuth(QMainWindow, Ui_userAuth):
-    userAuthorized = pyqtSignal(str)
+    userAuthorized = pyqtSignal(str, str)
     def __init__(self, parent=None):
         """
         Constructor
@@ -49,23 +49,23 @@ class userAuth(QMainWindow, Ui_userAuth):
         configfile.close()
         try:
             self.mysqlconn = mysql.connector.connect(host = self.dbHost.text(), database = self.dbName.text(), user = self.dbLogin.text(), password = self.dbPassword.text())
-            if self.mysqlconn.is_connected():
-                cursor = self.mysqlconn.cursor()
-                cursor.execute("SELECT * FROM user WHERE username = '%s'" % self.userName.text())
-                row = cursor.fetchone()
-                if row[1] == self.userPassword.text():
-                    self.userAuthorized.emit(self.userName.text())
-                    self.close()
-                else: 
-                    self.msgbox = QMessageBox()
-                    self.msgbox.setText('Ошибка аутентификации пользователя')
-                    self.msgbox.show()
-                
         except:
             self.msgbox = QMessageBox()
             self.msgbox.setText('Невозможно подключиться к серверу')
             self.msgbox.show()
             print(mysql.connector.Error())
+        else:
+            if self.mysqlconn.is_connected():
+                cursor = self.mysqlconn.cursor()
+                cursor.execute("SELECT * FROM user WHERE username = '%s'" % self.userName.text())
+                row = cursor.fetchone()
+                if row[1] == self.userPassword.text():
+                    self.userAuthorized.emit(self.userName.text(), row[4])
+                    self.close()
+                else: 
+                    self.msgbox = QMessageBox()
+                    self.msgbox.setText('Ошибка аутентификации пользователя')
+                    self.msgbox.show()
             
     def closeEvent(self, event):
         self.mysqlconn.close()
