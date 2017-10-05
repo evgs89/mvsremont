@@ -21,6 +21,9 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
+       <widget class="QComboBox" name="devtypeBox"/>
+      </item>
+      <item>
        <widget class="QLabel" name="label">
         <property name="text">
          <string>с</string>
@@ -41,7 +44,28 @@
        <widget class="QDateEdit" name="dateBefore"/>
       </item>
       <item>
-       <widget class="QComboBox" name="stateBox"/>
+       <widget class="QComboBox" name="stateBox">
+        <item>
+         <property name="text">
+          <string>все</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>снятые</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>в цеху</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>на складе</string>
+         </property>
+        </item>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="refreshButton">

@@ -3,13 +3,14 @@
 """
 Module implementing MainWindow.
 """
-
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QAbstractTableModel, QDate, QVariant, Qt
-from PyQt5.QtWidgets import QMainWindow, QMessageBox
+from PyQt5 import QtSql
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QAbstractTableModel, QDate, Qt, QSortFilterProxyModel, QPoint
+from PyQt5.QtWidgets import QMainWindow,QHeaderView#, QMessageBox
 
 from .Ui_mainWindow import Ui_MainWindow
+from .models import operatorModel as Model
 
-import mysql.connector, configparser
+import configparser
 import datetime # , date, timedelta
 
 
@@ -29,29 +30,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         Today = QDate.currentDate()
         self.dateBefore.setDate(Today)
-        self.dateAfter.setDate(Today.addDays(-14))
+        self.dateAfter.setDate(Today.addDays(-214))
+        self.currentUser = user
+        self.readSettings()
+        query = """SELECT * FROM MBC_PEMOHT.operatorView WHERE
+                    `takeoffDate` >= DATE('%s') AND `takeoffDate` <= DATE('%s');""" % (self.dateAfter.date().toString("yyyy-MM-dd"), 
+                                                                                                                                self.dateBefore.date().toString("yyyy-MM-dd"))
+        self.connectDB(query)
+
+    def readSettings(self):
+        self.config = configparser.ConfigParser(allow_no_value = True)
+        self.config.read('./config/dbsettings.ini')
     
-    @pyqtSlot(QDate)
-    def on_dateAfter_userDateChanged(self, date):
-        """
-        Slot documentation goes here.
-        
-        @param date DESCRIPTION
-        @type QDate
-        """
-        # TODO: not implemented yet
-        pass
-    
-    @pyqtSlot(QDate)
-    def on_dateBefore_userDateChanged(self, date):
-        """
-        Slot documentation goes here.
-        
-        @param date DESCRIPTION
-        @type QDate
-        """
-        # TODO: not implemented yet
-        pass
+    def connectDB(self, initQuery):
+        self.db = QtSql.QSqlDatabase.addDatabase('QMYSQL')
+        self.db.setHostName(self.config['db']['host'])
+        self.db.setUserName(self.config['db']['login'])
+        self.db.setPassword(self.config['db']['password'])
+        self.db.setDatabaseName(self.config['db']['dbname'])
+        tabmodel = Model(self, self.db, initQuery)
+        orderedTabmodel = QSortFilterProxyModel(self)
+        orderedTabmodel.setSourceModel(tabmodel)
+        orderedTabmodel.setDynamicSortFilter(True)
+        self.tableView.setModel(orderedTabmodel)
+#        self.tableView.setContextMenuPolicy(Qt.CustomContextMenu)
+#        self.tableView.customContextMenuRequested[QPoint].connect(self.contextMenuRequested)
+        self.tableView.show()
+        self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
     
     @pyqtSlot(str)
     def on_stateBox_currentIndexChanged(self, p0):
