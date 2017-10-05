@@ -33,10 +33,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.dateAfter.setDate(Today.addDays(-214))
         self.currentUser = user
         self.readSettings()
-        query = """SELECT * FROM MBC_PEMOHT.operatorView WHERE
+        query = """SELECT * FROM operatorView WHERE
                     `takeoffDate` >= DATE('%s') AND `takeoffDate` <= DATE('%s');""" % (self.dateAfter.date().toString("yyyy-MM-dd"), 
                                                                                                                                 self.dateBefore.date().toString("yyyy-MM-dd"))
         self.connectDB(query)
+        devicesListQuery = QtSql.QSqlQuery()
+        self.devtypeBox.addItem("Все")
+        ok = devicesListQuery.exec("SELECT * FROM MBC_PEMOHT.typesOfDevices;")
+        if ok:
+            while devicesListQuery.next(): self.devtypeBox.addItem(devicesListQuery.value(0))
 
     def readSettings(self):
         self.config = configparser.ConfigParser(allow_no_value = True)
