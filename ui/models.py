@@ -9,21 +9,22 @@ class operatorModel(QtSql.QSqlQueryModel):
         self.gui = parent
         self.db = db
         self.columns = {0:'idIncident', 1:'serialNumber',  2:'type', 3:'takeoffDate', 4:'textProblems', 
-                                    5:'brigadeEngineer', 6:'desiredFinishDate', 7:'toEngeneerDate', 8:'toStockDate'}
+                                    5:'brigadeEngineer', 6:'desiredFinishDate', 7:'toEngeneerDate', 8:'engineer',  9:'toStockDate', 10:'setupDate'}
         self.columnsRus = {0:"№", 1:'Сер. №', 2:"тип", 3:"Демонтаж:", 4:"Причина демонтажа", 
-                                        5:"Бригада", 6:"Нужна на:", 7:"В цеху с:", 8:"Готова с:"}
+                                        5:"Бригада", 6:"Нужна на:", 7:"В цеху с:", 8:"Инженер", 9:"Готова с:", 10:'Установлена'}
         self.query = initQuery
-        self.refresh()
+        self.refresh(self.query)
     
-    def refresh(self):
+    def refresh(self, query):
         if not self.db.isOpen():
             try:
                 self.db.open()
             except:
                 print("Can't connect")
-        self.setQuery(self.query)
+        self.setQuery(query)
         for i in self.columnsRus.keys(): self.setHeaderData(i, QtCore.Qt.Horizontal, self.columnsRus[i])
         self.cached = {}
+        self.layoutChanged.emit()
     
     def data(self, index, role):
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
@@ -31,7 +32,6 @@ class operatorModel(QtSql.QSqlQueryModel):
             else: return super(operatorModel, self).data(index, role)
         else: return QtCore.QVariant()
     
-    def setData(self, index, value, role):
-        pass
+
     
     

@@ -8,6 +8,7 @@ from PyQt5.QtCore import pyqtSlot, pyqtSignal, QAbstractTableModel, QDate, Qt, Q
 from PyQt5.QtWidgets import QMainWindow,QHeaderView#, QMessageBox
 
 from .Ui_mainWindow import Ui_MainWindow
+from .addIncident import addIncident
 from .models import operatorModel as Model
 
 import configparser
@@ -30,12 +31,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         Today = QDate.currentDate()
         self.dateBefore.setDate(Today)
-        self.dateAfter.setDate(Today.addDays(-214))
         self.currentUser = user
         self.readSettings()
+        self.dateAfter.setDate(Today.addDays(0-int(self.progConfig['interface']['defaultDaysToView'])))
         query = """SELECT * FROM operatorView WHERE
-                    `takeoffDate` >= DATE('%s') AND `takeoffDate` <= DATE('%s');""" % (self.dateAfter.date().toString("yyyy-MM-dd"), 
-                                                                                                                                self.dateBefore.date().toString("yyyy-MM-dd"))
+                    `takeoffDate` >= DATE('%s') AND `takeoffDate` <= DATE('%s');""" % (
+                    self.dateAfter.date().toString("yyyy-MM-dd"), self.dateBefore.date().toString("yyyy-MM-dd"))
         self.connectDB(query)
         devicesListQuery = QtSql.QSqlQuery()
         self.devtypeBox.addItem("Все")
@@ -46,6 +47,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def readSettings(self):
         self.config = configparser.ConfigParser(allow_no_value = True)
         self.config.read('./config/dbsettings.ini')
+        self.progConfig = configparser.ConfigParser()
+        self.progConfig.read('./config/programsettings.ini')
     
     def connectDB(self, initQuery):
         self.db = QtSql.QSqlDatabase.addDatabase('QMYSQL')
@@ -63,32 +66,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tableView.show()
         self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
     
-    @pyqtSlot(str)
-    def on_stateBox_currentIndexChanged(self, p0):
-        """
-        Slot documentation goes here.
-        
-        @param p0 DESCRIPTION
-        @type str
-        """
-        # TODO: not implemented yet
-        pass
-    
     @pyqtSlot()
     def on_addIncidentButton_released(self):
-        """
-        Slot documentation goes here.
-        """
-        # TODO: not implemented yet
-        raise NotImplementedError
+        self.addIncidentDialog = addIncident(self.db)
+        self.addIncidentDialog.accepted.connect(self.on_refreshButton_released)
+        self.addIncidentDialog.show()
     
     @pyqtSlot()
     def on_refreshButton_released(self):
-        """
-        Slot documentation goes here.
-        """
-        # TODO: not implemented yet
-        raise NotImplementedError
+        if self.devtypeBox.currentText() != "Все": addQuery1 = " AND `type` = '%s'" % self.devtypeBox.currentText()
+        else: addQuery1 = ''
+        if self.stateBox.currentText() == "все": addQuery2 = ''
+        elif self.stateBox.currentText() == "снятые": addQuery2 = " AND `setupDate` IS NULL"
+        elif self.stateBox.currentText() == "в цеху": addQuery2 = " AND `toEngeneerDate` IS NOT NULL"
+        elif self.stateBox.currentText() == "на складе": addQuery2 = " AND `toStockDate` IS NOT NULL"
+        if self.serialNumberEdit.text() != '': addQuery3 = " AND `serialNumber` = '%s'" % self.serialNumberEdit.text()
+        else: addQuery3 = ''
+        query = "SELECT * FROM operatorView WHERE `takeoffDate` >= DATE('%s') AND `takeoffDate` <= DATE('%s')%s%s%s;" % (
+        self.dateAfter.date().toString("yyyy-MM-dd"), self.dateBefore.date().toString("yyyy-MM-dd"), addQuery1, addQuery2, addQuery3)
+        print(query)
+        self.tableView.model().sourceModel().refresh(query)
     
     @pyqtSlot()
     def on_connectToDbAction_triggered(self):
