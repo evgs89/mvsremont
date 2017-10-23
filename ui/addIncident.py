@@ -5,8 +5,9 @@ Module implementing addIncident.
 """
 
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QDialog, QRadioButton, QAbstractButton
+from PyQt5.QtWidgets import QDialog, QRadioButton, QPushButton
 from PyQt5 import QtSql
+import netaddr
 
 from .Ui_addIncident import Ui_Dialog
 
@@ -34,7 +35,7 @@ class addIncident(QDialog, Ui_Dialog):
         self.buttonBox.accepted.disconnect(self.accept)
         self.buttonBox.accepted.connect(self.on_buttonBox_accepted_clicked)
         self.buttonBox.rejected.disconnect(self.reject)
-        self.buttonBox.rejected.connect(self.on_buttonBox_rejected_clicked)       
+        self.buttonBox.rejected.connect(self.on_buttonBox_rejected_clicked)
         
     
     def connectDB(self):
@@ -81,6 +82,9 @@ class addIncident(QDialog, Ui_Dialog):
                 except: com = 0
                 self.comEdit.setValue(com)
             # when selected type, get typical problems and add them as checkable buttons to second tab
+            moreButton = QPushButton('Дополнительно')
+            moreButton.setCheckable(True)
+            moreButton.toggled.connect(self.commentEnabledToggle)
             while self.typicalProblemsLayout.count():
                 item = self.typicalProblemsLayout.takeAt(0)
                 widget = item.widget()
@@ -90,17 +94,25 @@ class addIncident(QDialog, Ui_Dialog):
             ok2 = problemsQry.exec(qryProblems)
             if ok2:
                 while problemsQry.next():
-                    pass
-                    
-            
+                    button = QPushButton()
+                    button.setText(problemsQry.value(0))
+                    button.setCheckable(True)
+                    self.typicalProblemsLayout.addWidget(button)
+                self.typicalProblemsLayout.addWidget(moreButton)
     
     @pyqtSlot()
     def on_ipEdit_editingFinished(self):
-        """
-        automatically calculate netmask and gateway
-        """
-        # TODO: not implemented yet
-        pass
+        # if there is no info in database, try to calculate netmask and gateway by ip
+        try: ip = netaddr.IPNetwork(self.ipEdit.text())
+        except: pass #if ip is not valid, do nothing
+        else:
+            if ip.ip.words[0] == 192: ip.prefixlen = 24
+            elif ip.ip.words[0] == 10: ip.prefixlen = 27
+            self.netmaskEdit.setText(str(ip.netmask))
+            if ip.prefixlen == 24: gateway = '%s.%s.%s.1' % (str(ip.ip.words[0]), str(ip.ip.words[1]), str(ip.ip.words[2]))
+            elif ip.prefixlen == 27: gateway = str(ip.broadcast - 1)
+            self.gatewayEdit.setText(gateway)
+            
     
     @pyqtSlot()
     def on_serialNumberEdit_editingFinished(self):
@@ -118,3 +130,7 @@ class addIncident(QDialog, Ui_Dialog):
         if index > 0: 
             self.toolBox.setCurrentIndex(index - 1)
         else: self.reject()
+    
+    def commentEnabledToggle(self, state):
+        self.commentEdit.setEnabled(state)
+        self.commentEdit.setReadOnly(not state)
