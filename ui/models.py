@@ -8,10 +8,10 @@ class operatorModel(QtSql.QSqlQueryModel):
         QtSql.QSqlQueryModel.__init__(self)
         self.gui = parent
         self.db = db
-        self.columns = {0:'idIncident', 1:'serialNumber',  2:'type', 3:'takeoffDate', 4:'textProblems', 
-                                    5:'brigadeEngineer', 6:'desiredFinishDate', 7:'toEngeneerDate', 8:'engineer',  9:'toStockDate', 10:'setupDate'}
-        self.columnsRus = {0:"№", 1:'Сер. №', 2:"тип", 3:"Демонтаж:", 4:"Причина демонтажа", 
-                                        5:"Бригада", 6:"Нужна на:", 7:"В цеху с:", 8:"Инженер", 9:"Готова с:", 10:'Установлена'}
+        self.columns = {0:'idIncident', 1:'serialNumber',  2:'type', 3:'location', 4:'takeoffDate', 5:'textProblems', 
+                                    6:'brigadeEngineer', 7:'desiredFinishDate', 8:'toEngeneerDate', 9:'engineer',  10:'toStockDate', 11:'setupDate'}
+        self.columnsRus = {0:"№", 1:'Сер. №', 2:"тип", 3:"Место", 4:"Демонтаж:", 5:"Причина демонтажа", 
+                                        6:"Бригада", 7:"Нужна на:", 8:"В цеху с:", 9:"Инженер", 10:"Готова с:", 11:'Установлена'}
         self.query = initQuery
         self.refresh(self.query)
     

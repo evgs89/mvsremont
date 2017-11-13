@@ -4,7 +4,7 @@
 Module implementing MainWindow.
 """
 from PyQt5 import QtSql
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QAbstractTableModel, QDate, Qt, QSortFilterProxyModel, QPoint
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QDate, QSortFilterProxyModel, Qt, QModelIndex
 from PyQt5.QtWidgets import QMainWindow,QHeaderView#, QMessageBox
 
 from .Ui_mainWindow import Ui_MainWindow
@@ -12,7 +12,7 @@ from .addIncident import addIncident
 from .models import operatorModel as Model
 
 import configparser
-import datetime # , date, timedelta
+#import datetime # , date, timedelta
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -40,7 +40,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.connectDB(query)
         devicesListQuery = QtSql.QSqlQuery()
         self.devtypeBox.addItem("Все")
-        ok = devicesListQuery.exec("SELECT * FROM MBC_PEMOHT.typesOfDevices;")
+        ok = devicesListQuery.exec("SELECT * FROM typesOfDevices;")
         if ok:
             while devicesListQuery.next(): self.devtypeBox.addItem(devicesListQuery.value(0))
 
@@ -68,7 +68,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     @pyqtSlot()
     def on_addIncidentButton_released(self):
-        self.addIncidentDialog = addIncident(self.db)
+        self.addIncidentDialog = addIncident(self.db, self.currentUser)
         self.addIncidentDialog.accepted.connect(self.on_refreshButton_released)
         self.addIncidentDialog.show()
     
@@ -84,7 +84,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else: addQuery3 = ''
         query = "SELECT * FROM operatorView WHERE `takeoffDate` >= DATE('%s') AND `takeoffDate` <= DATE('%s')%s%s%s;" % (
         self.dateAfter.date().toString("yyyy-MM-dd"), self.dateBefore.date().toString("yyyy-MM-dd"), addQuery1, addQuery2, addQuery3)
-        print(query)
         self.tableView.model().sourceModel().refresh(query)
     
     @pyqtSlot()
@@ -100,3 +99,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         # TODO: not implemented yet
         self.close()
+
+    @pyqtSlot(QModelIndex)
+    def on_tableView_activated(self, index):
+        """
+       same as addIncident, but it's necessary to use real ID of existing incident
+        
+        @param index DESCRIPTION
+        @type QModelIndex
+        """
+        # TODO: not implemented yet
+        idIndex = index.sibling(index.row(), 0)
+        id = self.tableView.model().data(idIndex, Qt.DisplayRole)
+        self.addIncidentDialog = addIncident(self.db, self.currentUser, id)
+        self.addIncidentDialog.accepted.connect(self.on_refreshButton_released)
+        self.addIncidentDialog.show()
+        
+        

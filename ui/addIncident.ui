@@ -116,6 +116,16 @@
          <item row="4" column="0" colspan="2">
           <layout class="QVBoxLayout" name="typeDevicesLayout"/>
          </item>
+         <item row="9" column="0">
+          <widget class="QComboBox" name="locationComboBox"/>
+         </item>
+         <item row="9" column="1">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Район установки</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
       </layout>
@@ -137,6 +147,16 @@
         <layout class="QVBoxLayout" name="typicalProblemsLayout"/>
        </item>
        <item>
+        <widget class="QPushButton" name="moreButton">
+         <property name="text">
+          <string>Дополнительно</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QTextBrowser" name="commentEdit">
          <property name="enabled">
           <bool>false</bool>
@@ -146,19 +166,39 @@
       </layout>
      </widget>
      <widget class="QWidget" name="page_3">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>257</width>
+        <height>253</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Дата ожидаемой установки</string>
       </attribute>
-      <widget class="QCalendarWidget" name="desiredFinishDateCalendar">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>331</width>
-         <height>211</height>
-        </rect>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Демонтировал инженер:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="brigadeLayout"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Дата желаемой передачи на монтаж:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCalendarWidget" name="desiredFinishDateCalendar"/>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
@@ -184,6 +224,7 @@
   <tabstop>netmaskEdit</tabstop>
   <tabstop>gatewayEdit</tabstop>
   <tabstop>comEdit</tabstop>
+  <tabstop>locationComboBox</tabstop>
   <tabstop>commentEdit</tabstop>
   <tabstop>desiredFinishDateCalendar</tabstop>
  </tabstops>
