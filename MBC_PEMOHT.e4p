@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-5.1.dtd">
 <!-- eric project file for project MBC_PEMOHT -->
-<!-- Saved: 2017-10-16, 18:56:30 -->
+<!-- Saved: 2017-11-14, 18:53:27 -->
 <!-- Copyright (C) 2017 ,  -->
 <Project version="5.1">
   <Language>en_US</Language>
@@ -17,15 +17,18 @@
     <Source>__init__.py</Source>
     <Source>ui/Ui_addIncident.py</Source>
     <Source>ui/Ui_mainWindow.py</Source>
+    <Source>ui/Ui_servicemanForm.py</Source>
     <Source>ui/Ui_userAuth.py</Source>
     <Source>ui/addIncident.py</Source>
     <Source>ui/mainWindow.py</Source>
     <Source>ui/models.py</Source>
+    <Source>ui/servicemanForm.py</Source>
     <Source>ui/userAuth.py</Source>
   </Sources>
   <Forms>
     <Form>ui/addIncident.ui</Form>
     <Form>ui/mainWindow.ui</Form>
+    <Form>ui/servicemanForm.ui</Form>
     <Form>ui/userAuth.ui</Form>
   </Forms>
   <Translations/>

@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets
 from ui.userAuth import userAuth
 from ui.mainWindow import MainWindow
+from ui.servicemanForm import serviceman
 import sys
 
 class windowMaker:
@@ -14,9 +15,9 @@ class windowMaker:
             self.msgbox.setText('Админку пока не сделал')
             self.msgbox.show()
         elif role == "ingeneer":
-            self.msgbox = QtWidgets.QMessageBox()
-            self.msgbox.setText('Инженерка пока не сделана')
-            self.msgbox.show()
+            self.servicemanWindow = serviceman(user)
+            self.servicemanWindow.reconnectDB.connect(self.showAuthWindow)
+            self.servicemanWindow.show()
         else:
             self.msgbox = QtWidgets.QMessageBox()
             self.msgbox.setText('Пользователь неверно настроен, обратитесь к администратору')
